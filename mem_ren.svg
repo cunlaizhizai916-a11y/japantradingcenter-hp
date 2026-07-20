@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 520">
+<defs>
+ <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#F5455C"/><stop offset="1" stop-color="#7A1024"/>
+ </linearGradient>
+ <radialGradient id="spot" cx="0.5" cy="0.32" r="0.6">
+  <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+  <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+ </radialGradient>
+</defs>
+<rect width="400" height="520" fill="url(#g)"/>
+<rect width="400" height="520" fill="url(#spot)"/>
+<!-- sparkle dots -->
+<g fill="#ffffff" opacity="0.5">
+ <circle cx="60" cy="80" r="3"/><circle cx="330" cy="120" r="4"/>
+ <circle cx="300" cy="60" r="2.5"/><circle cx="90" cy="150" r="2"/>
+ <circle cx="350" cy="230" r="2.5"/><circle cx="40" cy="250" r="3"/>
+</g>
+<!-- figure silhouette -->
+<g transform="translate(200,300)" fill="#000000" opacity="0.28">
+ <circle cx="0" cy="-70" r="52"/>
+ <path d="M -95 150 C -95 30 -55 -10 0 -10 C 55 -10 95 30 95 150 Z"/>
+</g>
+<g transform="translate(200,300)" fill="#ffffff" opacity="0.14">
+ <circle cx="-14" cy="-78" r="52"/>
+ <path d="M -100 145 C -100 25 -60 -15 -5 -15 C 50 -15 90 25 90 145 Z"/>
+</g>
+<!-- mic -->
+<g transform="translate(255,250) rotate(20)" opacity="0.9">
+ <rect x="-6" y="0" width="12" height="70" rx="6" fill="#ffffff" opacity="0.85"/>
+ <circle cx="0" cy="-6" r="17" fill="#ffffff"/>
+ <circle cx="0" cy="-6" r="17" fill="#F5455C" opacity="0.25"/>
+</g>
+<!-- name plate -->
+<rect x="0" y="430" width="400" height="90" fill="#000000" opacity="0.35"/>
+<text x="30" y="478" font-family="Hiragino Sans, sans-serif" font-size="46" font-weight="900" fill="#ffffff">蓮</text>
+<text x="30" y="505" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" opacity="0.85">REN ・ 王子系センター</text>
+<circle cx="360" cy="465" r="22" fill="#ffffff"/>
+<circle cx="360" cy="465" r="16" fill="#F5455C"/>
+</svg>

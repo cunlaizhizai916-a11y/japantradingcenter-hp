@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>推しオリパ｜OSHI ORIPA - アイドル中古オリパ</title>
+<style>
+:root{
+  --coral:#F5455C; --coral-d:#d62e46; --purple:#8A5CF0; --gold:#F6B821;
+  --ink:#1b1b2b; --grey:#8a8a9a; --bg:#f4f5f8; --card:#ffffff; --navy:#221c3a; --line:#ecedf3; --mint:#2CB77E;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:"Hiragino Sans","Yu Gothic",sans-serif;background:#22243a;color:var(--ink)}
+#app{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.4)}
+img{display:block}
+
+header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
+header .logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:17px}
+header .logo .b{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--coral),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+header .logo small{display:block;font-size:9px;color:var(--coral);font-weight:800;letter-spacing:.02em}
+.coin{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fff3d0,#ffe08a);border:1px solid #f0cf7a;padding:6px 12px;border-radius:999px;font-weight:900;color:#8a5a06;font-size:14px}
+.coin .c{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a8,#f6b821 70%,#d99406);box-shadow:inset 0 0 0 2px #e2a51f}
+.charge{width:30px;height:30px;border-radius:50%;border:none;background:var(--coral);color:#fff;font-size:20px;font-weight:900;cursor:pointer;line-height:1}
+.cmodal{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;background:rgba(20,10,34,.55)}
+.cmodal.show{display:flex}
+.cbox{width:100%;max-width:430px;background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 26px;animation:up .25s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+.cbox .ch{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:900}
+.cbox .ch span{cursor:pointer;color:var(--grey);font-size:18px}
+.cbox .cnote{font-size:11px;color:var(--grey);margin:4px 0 12px;font-weight:700}
+.cpacks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cpack{border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;cursor:pointer;background:#fff;text-align:left}
+.cpack:active{transform:scale(.98)}
+.cpack .yen{font-size:15px;font-weight:900}
+.cpack .get{font-size:11.5px;color:var(--coral);font-weight:800;margin-top:2px}
+.cpack .bonus{display:inline-block;font-size:9.5px;font-weight:900;background:#ffe08a;color:#8a5a06;padding:1px 6px;border-radius:999px;margin-top:4px}
+
+.view{display:none;padding-bottom:92px}
+.view.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* category chips */
+.cats{display:flex;gap:8px;overflow-x:auto;padding:12px 14px 6px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cats .cat{flex:0 0 auto;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;background:#fff;color:var(--grey);border:1px solid var(--line)}
+.cats .cat.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* hero banner */
+.hero{margin:6px 14px 4px;border-radius:18px;overflow:hidden;position:relative;color:#fff;padding:18px 16px 20px;
+  background:linear-gradient(135deg,#2b1444,#6a1f4d 55%,#b7263f)}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:800}
+.hero h1{margin:10px 0 5px;font-size:21px;font-weight:900;line-height:1.25}
+.hero p{margin:0;font-size:12px;opacity:.92;line-height:1.6}
+
+/* quick find */
+.qf{margin:12px 14px 2px;background:#fff;border-radius:16px;padding:13px 14px;box-shadow:0 4px 14px rgba(30,20,50,.07)}
+.qf h3{margin:0 0 3px;font-size:13px;font-weight:900}
+.qf .s{font-size:10.5px;color:var(--grey);margin:0 0 10px}
+.qf .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.qf .row .lbl{width:100%;font-size:10px;color:var(--grey);font-weight:800;margin-bottom:2px}
+.pill{padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:800;border:1.5px solid var(--line);background:#fff;color:#555;cursor:pointer}
+.pill.on{background:var(--coral);color:#fff;border-color:var(--coral)}
+
+/* search */
+.search{margin:12px 14px 4px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.search input{border:none;outline:none;flex:1;font-size:14px;font-family:inherit;background:transparent}
+
+.sec{padding:14px 14px 4px}
+.sec h2{font-size:15px;font-weight:900;margin:0;display:flex;align-items:center;gap:7px}
+.sec h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--coral)}
+.sec .sub{font-size:11px;color:var(--grey);margin:3px 0 0}
+.sec .count{margin-left:auto;font-size:11px;color:var(--grey);font-weight:800}
+
+/* group grid */
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 14px 14px}
+.gcard{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(30,20,50,.1);cursor:pointer;transition:transform .1s}
+.gcard:active{transform:scale(.98)}
+.gcard .th{position:relative}
+.gcard .th img{width:100%;height:108px;object-fit:cover}
+.gcard .th .gender{position:absolute;top:7px;left:7px;font-size:9.5px;font-weight:900;padding:2px 7px;border-radius:999px;color:#fff}
+.gcard .th .tier{position:absolute;top:7px;right:7px;font-size:9px;font-weight:900;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.5);color:#fff}
+.gcard .in{padding:9px 10px 11px}
+.gcard .nm{font-size:13px;font-weight:900;line-height:1.2;margin-bottom:4px}
+.gcard .meta{font-size:10px;color:var(--grey);font-weight:700}
+.gcard .fundmini{margin-top:7px}
+.gcard .fundmini .bar{height:5px;background:#eee;border-radius:999px;overflow:hidden}
+.gcard .fundmini .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),var(--purple))}
+.gcard .fundmini .t{font-size:9px;color:var(--coral);font-weight:800;margin-top:3px}
+.noresult{padding:40px 20px;text-align:center;color:var(--grey);font-size:12px}
+
+/* group detail */
+.gdetail-hero{color:#fff;padding:46px 16px 16px;position:relative}
+.gdetail-hero .back{position:absolute;top:14px;left:12px;background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;z-index:3}
+.gdetail-hero h1{margin:6px 0 4px;font-size:22px;font-weight:900}
+.badge-major{display:inline-block;background:linear-gradient(135deg,#F6B821,#e0901f);color:#4a2f00;font-size:10px;font-weight:900;padding:3px 10px;border-radius:999px}
+.major-top{text-align:center;padding:0 14px}
+.award-img{width:100%;border-radius:14px;margin-top:2px;display:block}
+.fandom{font-size:12px;font-weight:800;color:var(--purple);margin-top:11px;letter-spacing:.05em}
+.catchcopy{font-size:13px;font-weight:800;color:var(--ink);margin-top:4px;line-height:1.5}
+.achv-wrap{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:12px}
+.achv{font-size:11px;font-weight:800;background:#fff;border:1.5px solid #f0d48a;color:#8a6d0c;padding:6px 11px;border-radius:999px;box-shadow:0 2px 8px rgba(246,184,33,.15)}
+.gdetail-hero .meta{font-size:11.5px;opacity:.9;font-weight:700}
+.fundbox{margin:-8px 14px 6px;background:#fff;border-radius:16px;padding:13px 14px;box-shadow:0 6px 20px rgba(30,20,50,.12);position:relative;z-index:2}
+.fundbox .ft{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.fundbox .ft .l{font-size:12px;font-weight:900}
+.fundbox .ft .v{font-size:15px;font-weight:900;color:var(--coral)}
+.fundbox .bar{height:10px;background:#eee;border-radius:999px;overflow:hidden}
+.fundbox .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),var(--purple))}
+.fundbox .reward{margin-top:8px;font-size:11px;color:#555;line-height:1.5;background:#fff6e9;border-radius:10px;padding:8px 10px}
+.fundbox .reward b{color:#b8790a}
+
+.mchips{display:flex;gap:8px;overflow-x:auto;padding:8px 14px 6px;scrollbar-width:none}
+.mchips::-webkit-scrollbar{display:none}
+.mchip{flex:0 0 auto;text-align:center;cursor:pointer}
+.mchip .av{width:56px;height:56px;border-radius:14px;overflow:hidden;border:2.5px solid transparent}
+.mchip.got .av{border-color:var(--mint)}
+.mchip .av img,.mchip .av .genart{width:100%;height:100%}
+.mchip .nm{font-size:10.5px;font-weight:800;margin-top:3px}
+.mchip .got-t{font-size:8.5px;color:var(--mint);font-weight:800}
+
+.genart{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900}
+.genart span{font-size:1.4em;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+
+/* oripa card */
+.grid{display:grid;grid-template-columns:1fr;gap:14px;padding:8px 14px 14px}
+.oripa{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 6px 20px rgba(30,20,50,.1)}
+.oripa .top{position:relative;padding:14px 14px 12px;color:#fff}
+.oripa .top .badge{position:absolute;top:12px;right:12px;background:var(--gold);color:#5a3c00;font-size:10px;font-weight:900;padding:3px 8px;border-radius:999px}
+.oripa .top h3{margin:0 0 3px;font-size:15px;font-weight:900}
+.oripa .top .kai{font-size:11px;opacity:.9}
+.oripa .body{padding:12px 14px 14px}
+.bar2{height:8px;background:#eee;border-radius:999px;overflow:hidden;margin:2px 0 4px}
+.bar2>i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),var(--purple))}
+.stock{display:flex;justify-content:space-between;font-size:11px;color:var(--grey);font-weight:700}
+.prizes{margin:11px 0 12px}
+.prizes .pt{font-size:10px;color:var(--grey);font-weight:800;margin-bottom:5px}
+.pz{display:flex;align-items:center;gap:7px;font-size:11px;padding:5px 8px;border-radius:9px;margin-bottom:4px;font-weight:700}
+.pz .r{font-size:9.5px;font-weight:900;padding:1px 6px;border-radius:5px;color:#fff}
+.pz.ur{background:#fde7ec}.pz.ur .r{background:var(--coral)}
+.pz.ssr{background:#efe7fe}.pz.ssr .r{background:var(--purple)}
+.pz.sr{background:#fff2d6}.pz.sr .r{background:var(--gold);color:#5a3c00}
+.pz .val{margin-left:auto;font-weight:900;color:#b8790a;font-size:10.5px}
+.pullbtns{display:flex;gap:8px}
+.btn{flex:1;border:none;border-radius:12px;padding:12px 8px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;transition:transform .08s}
+.btn:active{transform:scale(.97)}
+.btn.p{background:linear-gradient(135deg,var(--coral),#ff6a7d);color:#fff;box-shadow:0 6px 16px rgba(245,69,92,.35)}
+.btn.s{background:#fff;color:var(--coral);border:2px solid var(--coral)}
+.gtee{margin-top:9px;font-size:10.5px;color:var(--mint);font-weight:800;text-align:center;background:#e8f8f0;border-radius:8px;padding:6px;line-height:1.5}
+
+/* ranking */
+.rank{padding:6px 14px}
+.rk-item{display:flex;align-items:center;gap:11px;background:#fff;border-radius:14px;padding:11px;margin-bottom:10px;box-shadow:0 4px 14px rgba(30,20,50,.07)}
+.rk-item .no{font-size:20px;font-weight:900;width:26px;text-align:center;color:var(--grey)}
+.rk-item.top1 .no{color:var(--gold)}.rk-item.top2 .no{color:#a9b0bd}.rk-item.top3 .no{color:#cd7f4e}
+.rk-item img{width:44px;height:44px;border-radius:11px;object-fit:cover}
+.rk-item .info{flex:1;min-width:0}
+.rk-item .info .nm{font-weight:900;font-size:13px}
+.rk-item .info .pt{font-size:10.5px;color:var(--grey);font-weight:700}
+.rk-bar{height:6px;border-radius:999px;background:#eee;margin-top:5px;overflow:hidden}
+.rk-bar>i{display:block;height:100%;border-radius:999px}
+
+/* collection */
+.coll{padding:6px 14px}
+.inv-summary{background:linear-gradient(135deg,#221c3a,#4a2a63);color:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
+.inv-summary .lab{font-size:11px;opacity:.8;font-weight:700}
+.inv-summary .val{font-size:28px;font-weight:900;margin:2px 0}
+.inv-summary .note{font-size:10px;opacity:.8;margin-top:6px;line-height:1.5}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.citem{border-radius:12px;overflow:hidden;position:relative;box-shadow:0 3px 10px rgba(30,20,50,.1)}
+.citem img,.citem .genart{width:100%;height:96px;object-fit:cover}
+.citem .qty{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px}
+.citem .rar{position:absolute;top:4px;left:4px;font-size:9px;font-weight:900;padding:1px 6px;border-radius:6px;color:#fff}
+.empty{text-align:center;color:var(--grey);font-size:12px;padding:40px 20px;line-height:1.7}
+
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:40}
+nav button{flex:1;background:none;border:none;padding:9px 0 11px;font-family:inherit;cursor:pointer;color:var(--grey)}
+nav button .ic{font-size:19px}
+nav button .lb{font-size:10px;font-weight:800;margin-top:3px;display:block}
+nav button.on{color:var(--coral)}
+
+/* opening */
+#opening{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#3a1c56,#140a22 80%);overflow:hidden}
+#opening.show{display:flex}
+.rays{position:absolute;width:900px;height:900px;background:conic-gradient(from 0deg,transparent 0 8deg,rgba(255,255,255,.10) 8deg 16deg);border-radius:50%;animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.reveal{position:relative;z-index:2;text-align:center;color:#fff;width:88%;max-width:340px}
+.reveal .rlabel{font-size:14px;font-weight:800;opacity:.95;margin-bottom:10px;min-height:20px}
+.cardflip{width:200px;height:276px;margin:0 auto;perspective:1200px}
+.cardflip .inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.cardflip.flip .inner{transform:rotateY(180deg)}
+.cardface{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.cardback{background:linear-gradient(135deg,#F5455C,#8A5CF0);display:flex;align-items:center;justify-content:center;color:#fff;font-size:56px;font-weight:900}
+.cardfront{transform:rotateY(180deg);background:#111}
+.cardfront img,.cardfront .genart{width:100%;height:100%;object-fit:cover}
+.cardfront .frame{position:absolute;inset:0;border-radius:16px;pointer-events:none}
+.cardfront .holo{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 48%,transparent 66%);transform:translateX(-100%)}
+.cardfront .holo.run{animation:sheen 1.4s ease .1s 2}
+@keyframes sheen{to{transform:translateX(120%)}}
+.rperk{margin-top:14px;font-size:12.5px;font-weight:800;background:rgba(255,255,255,.12);border-radius:12px;padding:10px;min-height:18px;line-height:1.4}
+.rbtns{margin-top:14px;display:flex;gap:8px}
+.rbtns button{flex:1;padding:12px;border-radius:12px;border:none;font-weight:900;font-family:inherit;cursor:pointer}
+.rbtns .again{background:linear-gradient(135deg,var(--coral),#ff6a7d);color:#fff}
+.rbtns .close{background:rgba(255,255,255,.16);color:#fff}
+.result-multi{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:8px}
+.result-multi .mc{width:48px;height:66px;border-radius:7px;overflow:hidden;position:relative;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.result-multi .mc img,.result-multi .mc .genart{width:100%;height:100%;object-fit:cover}
+.result-multi .mc .rr{position:absolute;top:0;left:0;right:0;font-size:8px;font-weight:900;text-align:center;color:#fff;background:rgba(0,0,0,.35)}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#221c3a;color:#fff;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:800;z-index:200;opacity:0;transition:opacity .3s;max-width:90%}
+.toast.show{opacity:1}
+.demo-note{background:#fffbe6;border:1px dashed #e6c34d;color:#8a6d0c;font-size:10px;font-weight:700;margin:12px 14px 4px;padding:8px 12px;border-radius:10px;text-align:center;line-height:1.5}
+.fav{position:absolute;top:14px;right:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.22);color:#fff;font-size:18px;cursor:pointer;z-index:3}
+.fav.on{background:#fff;color:var(--coral)}
+.gcard .th .heart{position:absolute;bottom:7px;right:7px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(0,0,0,.45);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gcard .th .heart.on{background:#fff;color:var(--coral)}
+.gd-zepp{width:100%;border-radius:12px;margin-top:10px;display:block}
+.gp{margin:8px 14px 6px;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(30,20,50,.12);background:#fff}
+.gp .gp-img{width:100%;display:block}
+.gp .gp-body{padding:12px 14px 14px}
+.gp .gp-h{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.gp .gp-h .mini{width:40px;height:40px;border-radius:10px;object-fit:cover}
+.gp .gp-h .t .cat{font-size:10px;font-weight:900;color:var(--grey)}
+.gp .gp-h .t .nm{font-size:15px;font-weight:900}
+.gp .rw{display:flex;gap:8px;align-items:flex-start;font-size:11.5px;font-weight:700;color:#333;padding:7px 0;border-top:1px solid var(--line);line-height:1.45}
+.gp .rw .ic{font-size:15px}
+.gp .note{font-size:9.5px;color:var(--grey);margin-top:8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="b">推</span><span>推しオリパ<small>OSHI ORIPA MARKET</small></span></div>
+    <div style="display:flex;align-items:center;gap:7px">
+      <div class="coin"><span class="c"></span><span id="coinbal">5,000</span></div>
+      <button class="charge" onclick="openCharge()">＋</button>
+    </div>
+  </header>
+
+  <!-- ============ DISCOVERY (home) ============ -->
+  <section class="view active" id="v-home">
+    <div class="cats" id="cats"></div>
+    <div class="hero">
+      <span class="tag">🎤 アイドル中古グッズ・オリパ</span>
+      <h1>推しの“プレ値グッズ”、<br>当たるかも。</h1>
+      <p>直筆サイン入りチェキも、着用済み衣装も。回すほど、その一部が推しの活動資金に。</p>
+    </div>
+
+    <div class="qf">
+      <h3>🔎 3タップで推しを見つける</h3>
+      <p class="s">最短ルートであなたの“沼”へ。</p>
+      <div class="row"><span class="lbl">性別</span>
+        <span class="pill" data-f="gender" data-v="男">男性グループ</span>
+        <span class="pill" data-f="gender" data-v="女">女性グループ</span></div>
+      <div class="row"><span class="lbl">タイプ</span>
+        <span class="pill" data-f="genre" data-v="王道">王道</span>
+        <span class="pill" data-f="genre" data-v="ヴィジュアル系">ヴィジュアル系</span>
+        <span class="pill" data-f="genre" data-v="ロック">ロック</span>
+        <span class="pill" data-f="genre" data-v="ポップ">ポップ</span>
+        <span class="pill" data-f="genre" data-v="クール">クール</span></div>
+      <div class="row"><span class="lbl">規模</span>
+        <span class="pill" data-f="tier" data-v="地下">地下（近さ重視）</span>
+        <span class="pill" data-f="tier" data-v="メジャー">メジャー</span></div>
+    </div>
+
+    <div class="search">
+      <span>🔍</span><input id="q" placeholder="グループ名で検索（例：Bぃ）" oninput="renderGroups()">
+    </div>
+    <div style="display:flex;gap:8px;padding:9px 14px 0">
+      <span class="pill" id="favToggle" onclick="toggleFavFilter()">♡ お気に入りだけ</span>
+    </div>
+
+    <div class="sec"><h2><span class="dot"></span>グループを探す</h2>
+      <span class="count" id="gcount"></span></div>
+    <div class="ggrid" id="ggrid"></div>
+    <div class="demo-note">プロトタイプ / 画像・グループ・数値はすべて架空。登録目標：メン地下50組。</div>
+  </section>
+
+  <!-- ============ GROUP DETAIL ============ -->
+  <section class="view" id="v-group">
+    <div class="gdetail-hero" id="gd-hero">
+      <button class="back" onclick="go('home')">‹</button>
+      <button class="fav" id="gd-fav" onclick="toggleFav(curGroup.id)">♡</button>
+      <div id="gd-badge"></div>
+      <h1 id="gd-name"></h1>
+      <div class="meta" id="gd-meta"></div>
+    </div>
+    <div id="gd-body"></div>
+  </section>
+
+  <!-- ============ RANKING ============ -->
+  <section class="view" id="v-rank">
+    <div class="sec" style="padding-top:16px"><h2><span class="dot"></span>部門別グランプリ</h2>
+      <p class="sub">グループ対抗。部門1位に、豪華副賞。</p></div>
+    <div id="gp-list"></div>
+    <div class="sec"><h2><span class="dot"></span>流通量ランキング（地下）</h2>
+      <p class="sub">競争は地下界隈のみ。有名グループは非競争の別枠（純粋なグッズガチャ）。</p></div>
+    <div class="rank" id="rank-list"></div>
+    <div class="fundbox" style="margin:8px 14px 0;box-shadow:0 4px 14px rgba(30,20,50,.07)">
+      <div class="reward" style="background:#eef1ff">
+        💡 <b>あなたの課金の使い道</b>：オリパ売上の一部が各グループの<b>応援ファンド</b>に積立。目標達成で、そのグループが<b>ワンマンライブ・新衣装・記念グッズ</b>など“本人が一番喜ぶこと”を実現します。応援した甲斐が、目に見える形に。
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COLLECTION ============ -->
+  <section class="view" id="v-coll">
+    <div class="sec" style="padding-top:16px"><h2><span class="dot"></span>マイコレクション</h2>
+      <p class="sub">当てた中古グッズと、その推定プレ値。</p></div>
+    <div class="coll">
+      <div class="inv-summary">
+        <div class="lab">保有グッズの推定プレ値（コレクション時価）</div>
+        <div class="val" id="inv-val">¥0</div>
+        <div class="note">中古市場の相場に基づく参考値です。※架空のシミュレーション。現金化ではなくコレクションの価値目安。</div>
+      </div>
+      <div class="cgrid" id="coll-grid"></div>
+      <div class="empty" id="coll-empty">まだグッズがありません。<br>気になるグループのオリパを回してみよう。</div>
+    </div>
+  </section>
+
+  <nav>
+    <button class="on" data-v="home"><span class="ic">🔎</span><span class="lb">さがす</span></button>
+    <button data-v="rank"><span class="ic">👑</span><span class="lb">ランキング</span></button>
+    <button data-v="coll"><span class="ic">💎</span><span class="lb">マイコレ</span></button>
+  </nav>
+</div>
+
+<div id="opening">
+  <div class="rays"></div>
+  <div class="reveal">
+    <div class="rlabel" id="rlabel">開封中…</div>
+    <div class="cardflip" id="flip"><div class="inner">
+      <div class="cardface cardback">推</div>
+      <div class="cardface cardfront" id="cardfront"></div>
+    </div></div>
+    <div class="result-multi" id="rmulti"></div>
+    <div class="rperk" id="rperk"></div>
+    <div class="rbtns"><button class="again" id="ragain">もう一度引く</button><button class="close" id="rclose">閉じる</button></div>
+  </div>
+</div>
+<div class="cmodal" id="charge">
+  <div class="cbox">
+    <div class="ch">コインをチャージ<span onclick="closeCharge()">✕</span></div>
+    <div class="cnote">1コイン ＝ 1円。まとめ買いでボーナス増量（デモ：無料で付与されます）。</div>
+    <div class="cpacks" id="cpacks"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA ============
+const CATS=['アイドル','トレカ','スニーカー','ゴルフ','フィギュア'];
+const namesM=['蓮','翔','樹','奏','颯','律','凪','楽','湊','遥','大和','陽','駿','煌','類','慧'];
+const namesF=['咲','凛','結衣','美羽','花音','愛梨','莉子','ひなの','詩','envy','舞','杏','珠','寧','紗','菜'];
+
+// featured group members with images
+const BII_MEMBERS=[
+ {n:'蓮',color:'#F5455C',img:'images/mem_ren.svg'},
+ {n:'蒼空',color:'#2E86F0',img:'images/mem_sora.svg'},
+ {n:'陽太',color:'#F6A821',img:'images/mem_hinata.svg'},
+ {n:'楓',color:'#2CB77E',img:'images/mem_kaede.svg'},
+ {n:'凛',color:'#8A5CF0',img:'images/mem_rin.svg'},
+];
+
+let GID=0;
+function G(name,gender,genre,region,tier,color,thumb,members,vol,fund,goal,reward){
+  return {id:'g'+(GID++),name,gender,genre,region,tier,color,thumb:'images/'+thumb,
+    members,volume:vol,fund,fundGoal:goal,fundReward:reward};
+}
+function gen(gender,n,off){const pool=gender==='男'?namesM:namesF;
+  return Array.from({length:n},(_,i)=>({n:pool[(off+i)%pool.length]}));}
+
+const GROUPS=[
+ G('Bぃ！group','男','王道','東京','地下','#F5455C','logo.svg',BII_MEMBERS,9200,620000,1000000,'目標達成で <b>Zeppワンマン</b> を開催！'),
+ G('焔 -HOMURA-','男','ロック','大阪','地下','#F5455C','grp_homura.svg',gen('男',5,0),7100,410000,800000,'目標達成で <b>全国ツアー</b> 実現。'),
+ G('CØSMIC BOYZ','男','ポップ','東京','地下','#2E86F0','grp_cosmic.svg',gen('男',5,3),6400,300000,700000,'目標達成で <b>新曲MV</b> 制作。'),
+ G('蒼月堂','男','クール','京都','地下','#18a5a5','grp_sougetsu.svg',gen('男',4,6),3900,180000,600000,'目標達成で <b>和装フォトブック</b>。'),
+ G('KINGShip','男','王道','名古屋','地下','#F6A821','grp_kingship.svg',gen('男',5,9),5200,260000,700000,'目標達成で <b>大型ワンマン</b>。'),
+ G('VELVET NOIR','男','ヴィジュアル系','東京','地下','#8A5CF0','grp_velvet.svg',gen('男',5,2),6800,350000,750000,'目標達成で <b>新衣装＆写真集</b>。'),
+ G('太陽グラフィティ','男','ポップ','福岡','地下','#FF8A3D','grp_taiyo.svg',gen('男',4,11),3200,120000,500000,'目標達成で <b>野外フェス出演</b>。'),
+ G('零號 -ZEROGO-','男','クール','東京','地下','#4a4f6a','grp_zerogo.svg',gen('男',5,5),4600,220000,650000,'目標達成で <b>単独公演</b>。'),
+ G('STELLA†KNIGHTS','男','メジャー','全国','メジャー','#5B6BF0','grp_stella.svg',gen('男',6,7),15800,1500000,2000000,'目標達成で <b>アリーナ公演</b>。'),
+ G('ぴゅあすまいる♡','女','王道','東京','地下','#FF6FB5','grp_pure.svg',gen('女',5,0),8100,470000,900000,'目標達成で <b>アイドルフェス冠</b>。'),
+ G('藍色シンフォニー','女','クール','神奈川','地下','#3F51B5','grp_aiiro.svg',gen('女',5,3),5900,290000,700000,'目標達成で <b>ホールワンマン</b>。'),
+ G('ハニポップ!','女','ポップ','東京','地下','#E23FA0','grp_honeypop.svg',gen('女',4,6),4300,200000,600000,'目標達成で <b>新曲リリース</b>。'),
+ G('桜色メロディ','女','王道','埼玉','地下','#FF9EC4','grp_sakura.svg',gen('女',5,9),4900,240000,650000,'目標達成で <b>写真集出版</b>。'),
+ G('REBEL DOLLS','女','ロック','大阪','地下','#D6224B','grp_rebel.svg',gen('女',5,2),6100,320000,720000,'目標達成で <b>対バンツアー</b>。'),
+ G('星屑パレット','女','ポップ','東京','地下','#B39DFF','grp_hoshikuzu.svg',gen('女',4,11),3600,150000,550000,'目標達成で <b>プラネタリウム公演</b>。'),
+ G('=PARTY=','女','メジャー','全国','メジャー','#3FC1E8','grp_party.svg',gen('女',7,4),18200,1700000,2200000,'目標達成で <b>ドームチャレンジ</b>。'),
+ G('LUMINA','女','メジャー','全国','メジャー','#C86BE0','grp_lumina.svg',gen('女',5,7),42000,0,1,'—'),
+];
+// 有名グループの"世界的スター"演出用データ
+const MAJOR_EXTRA={
+ 'LUMINA':{fandom:'GLOW', catch:'世界を席巻する9カ国発グローバル・ガールズグループ',
+   achv:['🏆 Billboard JAPAN Hot100 1位','💿 初動 128万枚 (自己最高)','🏟 東京ドーム 3days SOLD OUT','🌏 ワールドツアー 22都市 45公演']},
+ '=PARTY=':{fandom:'PARTiER', catch:'紅白の常連、国民的ガールズグループ',
+   achv:['🏆 日本レコード大賞 優秀作品賞','💿 初動 42万枚','🏟 横浜アリーナ 2days','📺 紅白歌合戦 3年連続出場']},
+ 'STELLA†KNIGHTS':{fandom:'KNIGHTS', catch:'アジアを狂わせる王道ボーイズグループ',
+   achv:['🏆 オリコン1位 通算8作','🏟 東京ドーム公演','🌏 アジアツアー 12都市','📺 主演ドラマ タイアップ']},
+};
+GROUPS.forEach(g=>{const e=MAJOR_EXTRA[g.name]; if(e){g.fandom=e.fandom;g.catch=e.catch;g.achv=e.achv;}});
+
+// rarity of 中古グッズ prizes
+const RORDER=['UR','SSR','SR','R','N'];
+const RVAL={ // 市場プレ値（相当額・円）
+ indie:{N:300,R:1500,SR:6000,SSR:28000,UR:90000},
+ major:{N:400,R:2500,SR:12000,SSR:60000,UR:300000}
+};
+function perkText(rar,isMajor){
+  if(isMajor)return {N:'通常トレカ／生写真',R:'ホロ仕様の生写真',SR:'✨ レア生写真・限定チェキ【プレ値】',
+    SSR:'🎴 会場限定フォトカード コンプ【激レア】',UR:'✍️ 直筆サイン入りトレカ（公式抽選品）【超プレ値】'}[rar];
+  return {N:'通常ブロマイド',R:'ホログラム生写真',SR:'✍️ 直筆サイン入りチェキ【プレ値】',
+    SSR:'👕 着用済み限定衣装【激レア】',UR:'💎 メンバー私物・一点物【超プレ値】'}[rar];
+}
+// オリパ 3段階（1コイン＝1円）
+const TIERS=[
+ {key:'try',name:'お試しオリパ',badge:'高保証',cost:100, min:80,  gtee:null, odds:{N:78,R:18,SR:4,SSR:0,UR:0}},
+ {key:'std',name:'スタンダードオリパ',badge:'人気',cost:500, min:300, gtee:'SR',odds:{N:68,R:22,SR:8,SSR:2,UR:0}},
+ {key:'jp', name:'一攫千金オリパ',badge:'わんちゃん',cost:3000,min:900, gtee:'SR',odds:{N:55,R:28,SR:12,SSR:4.4,UR:0.6}},
+];
+const tierByKey=k=>TIERS.find(t=>t.key===k);
+function rollRarity(tier){const x=Math.random()*100;let a=0;for(const k of RORDER){a+=(tier.odds[k]||0);if(x<=a)return k;}return 'N';}
+
+// ============ STATE ============
+let coins=5000;
+const CPACKS=[[500,500,0],[1000,1000,0],[3000,3150,5],[5000,5400,8],[10000,11000,10],[30000,34500,15]];
+function openCharge(){const w=document.getElementById('cpacks');w.innerHTML='';
+  CPACKS.forEach(([yen,get,bonus])=>{const el=document.createElement('div');el.className='cpack';
+    el.innerHTML=`<div class="yen">¥${fmt(yen)}</div><div class="get">${fmt(get)} コイン獲得</div>${bonus?`<span class="bonus">+${bonus}% ボーナス</span>`:''}`;
+    el.onclick=()=>{coins+=get;updateCoins();closeCharge();toast(`${fmt(get)}コイン チャージ（デモ）`);};
+    w.appendChild(el);});
+  document.getElementById('charge').classList.add('show');}
+function closeCharge(){document.getElementById('charge').classList.remove('show');}
+let filters={gender:null,genre:null,tier:null,fav:false};
+let curGroup=null, curBox=null; // curBox: {group, memberIdx or null}
+let collection={}; // key -> {group,memberName,art,rar,qty}
+let gotMembers={}; // groupId -> Set of member names got
+let favs=new Set(); // favorited group ids
+function toggleFav(id){if(favs.has(id))favs.delete(id);else favs.add(id);refreshAll();}
+function toggleFavFilter(){filters.fav=!filters.fav;document.getElementById('favToggle').classList.toggle('on',filters.fav);renderGroups();}
+
+// ============ HELPERS ============
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const fmt=n=>Math.round(n).toLocaleString('ja-JP');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1700);}
+function updateCoins(){$('#coinbal').textContent=fmt(coins);}
+function art(m,cls){ // returns HTML for member/group art
+  if(m&&m.img) return `<img src="${m.img}" alt="">`;
+  const col=(m&&m.color)||(curGroup&&curGroup.color)||'#8A5CF0';
+  return `<div class="genart" style="background:linear-gradient(135deg,${col},#221c3a)"><span>${(m&&m.n)||'?'}</span></div>`;
+}
+
+// ============ RENDER: categories ============
+function renderCats(){const c=$('#cats');c.innerHTML='';
+  CATS.forEach((n,i)=>{const el=document.createElement('span');el.className='cat'+(i===0?' on':'');el.textContent=n;
+    el.onclick=()=>{if(i!==0)toast('デモ：今回は「アイドル」棚のみ');};c.appendChild(el);});}
+
+// ============ RENDER: discovery ============
+function renderGroups(){
+  const q=($('#q')?.value||'').trim();
+  const list=GROUPS.filter(g=>
+    (!filters.gender||g.gender===filters.gender)&&
+    (!filters.genre||g.genre===filters.genre)&&
+    (!filters.tier||g.tier===filters.tier)&&
+    (!filters.fav||favs.has(g.id))&&
+    (!q||g.name.toLowerCase().includes(q.toLowerCase())));
+  $('#gcount').textContent=list.length+'組';
+  const grid=$('#ggrid');grid.innerHTML='';
+  if(!list.length){grid.innerHTML='<div class="noresult">条件に合うグループがいません。<br>絞り込みやお気に入りを外してみてください。</div>';return;}
+  list.forEach(g=>{
+    const pct=Math.min(100,Math.round(g.fund/g.fundGoal*100));
+    const fav=favs.has(g.id);
+    const el=document.createElement('div');el.className='gcard';
+    el.innerHTML=`<div class="th"><img src="${g.thumb}" alt="${g.name}">
+        <span class="gender" style="background:${g.gender==='男'?'#2E86F0':'#E23FA0'}">${g.gender==='男'?'男性':'女性'}</span>
+        <button class="heart${fav?' on':''}">${fav?'♥':'♡'}</button></div>
+      <div class="in"><div class="nm">${g.name}</div>
+        <div class="meta">${g.genre}・${g.region}・${g.tier}</div>
+        <div class="fundmini"><div class="bar"><i style="width:${pct}%"></i></div>
+        <div class="t">応援ファンド ${pct}%</div></div></div>`;
+    el.querySelector('.heart').onclick=(e)=>{e.stopPropagation();toggleFav(g.id);};
+    el.onclick=()=>openGroup(g);grid.appendChild(el);
+  });
+}
+function bindFilters(){
+  $$('.pill').forEach(p=>p.onclick=()=>{
+    const f=p.dataset.f,v=p.dataset.v;
+    filters[f]=filters[f]===v?null:v;
+    $$('.pill').forEach(x=>{if(x.dataset.f===f)x.classList.toggle('on',filters[f]===x.dataset.v);});
+    renderGroups();
+  });
+}
+
+// ============ RENDER: group detail ============
+function openGroup(g){curGroup=g;go('group');}
+function renderGroup(){
+  const g=curGroup;if(!g)return;
+  $('#gd-hero').style.background=`linear-gradient(135deg,${g.color},#221c3a)`;
+  $('#gd-name').textContent=g.name;
+  const favBtn=$('#gd-fav');favBtn.textContent=favs.has(g.id)?'♥':'♡';favBtn.classList.toggle('on',favs.has(g.id));
+  const isMajor=g.tier==='メジャー';
+  $('#gd-badge').innerHTML=isMajor?'<span class="badge-major">★ MAJOR ARTIST</span>':'';
+  $('#gd-meta').textContent=isMajor?`${g.gender==='男'?'男性':'女性'}・${g.genre}・${g.region}`
+    :`${g.gender==='男'?'男性':'女性'}グループ ・ ${g.genre} ・ ${g.region} ・ ${g.tier}`;
+  $('#gd-body').innerHTML=isMajor?majorHTML(g):indieHTML(g);
+  $$('#gd-body .btn').forEach(b=>b.onclick=()=>doPull({group:g,tier:tierByKey(b.dataset.tier)},parseInt(b.dataset.n)));
+}
+function prizeLabel(rar,isMajor){
+  if(isMajor)return {UR:'直筆サイン入りトレカ（公式抽選品）',SSR:'会場限定フォトカード コンプ',SR:'レア生写真・限定チェキ'}[rar];
+  return {UR:'メンバー私物・一点物',SSR:'着用済み限定衣装',SR:'直筆サイン入りチェキ'}[rar];
+}
+function prizesHTML(g,tier){
+  const isMajor=g.tier==='メジャー';const V=RVAL[isMajor?'major':'indie'];
+  return ['UR','SSR','SR'].filter(r=>(tier.odds[r]||0)>0).map(r=>
+    `<div class="pz ${r.toLowerCase()}"><span class="r">${r}</span>${prizeLabel(r,isMajor)}<span class="val">¥${fmt(V[r])}相当</span></div>`).join('');
+}
+function oripaCardHTML(g,tier){
+  const isMajor=g.tier==='メジャー';
+  return `<div class="oripa">
+    <div class="top" style="background:linear-gradient(135deg,${g.color},#221c3a)">
+      <span class="badge">${tier.badge}</span>
+      <h3>${g.name}｜${tier.name}</h3>
+      <div class="kai">1回 ${fmt(tier.cost)}コイン / 10連 ${fmt(tier.cost*10)}コイン</div></div>
+    <div class="body">
+      <div class="stock"><span>最低保証 ${fmt(tier.min)}コイン相当</span><span>残り 328口</span></div>
+      <div class="bar2"><i style="width:55%"></i></div>
+      <div class="prizes"><div class="pt">当たり（プレ値の中古グッズ）</div>${prizesHTML(g,tier)}</div>
+      <div class="pullbtns">
+        <button class="btn s" data-tier="${tier.key}" data-n="1">1回 ${fmt(tier.cost)}</button>
+        <button class="btn p" data-tier="${tier.key}" data-n="10">10連 ${fmt(tier.cost*10)}</button></div>
+      <div class="gtee">✓ 必ずグッズが当たる（福袋型）。外れても${fmt(tier.min)}コイン相当を保証＝手ぶらにならない。${tier.gtee?'<br>10連は'+tier.gtee+'以上を1枚保証。':''}${isMajor?'':'<br>売上の一部が '+g.name+' の応援ファンドへ。'}</div>
+    </div></div>`;
+}
+function majorHTML(g){
+  return `<div class="major-top">
+      <img class="award-img" src="images/award_banner.svg" alt="">
+      <div class="fandom">FANDOM ・ <b>${g.fandom}</b></div>
+      <div class="catchcopy">${g.catch}</div>
+      <div class="achv-wrap">${g.achv.map(a=>`<div class="achv">${a}</div>`).join('')}</div>
+    </div>
+    <div class="sec"><h2><span class="dot"></span>レア公式グッズ オリパ</h2>
+      <p class="sub">世界的スターの限定グッズを狙う。応援コンペ・会える権利はなし＝純粋なコレクション。</p></div>
+    <div class="grid">${TIERS.map(t=>oripaCardHTML(g,t)).join('')}</div>
+    <div class="demo-note" style="margin:6px 14px 14px">有名グループは事務所連携なしで扱える“レア公式グッズの中古”のみ。厚いファン層の入口（母集団形成）として。</div>`;
+}
+function indieHTML(g){
+  const pct=Math.min(100,Math.round(g.fund/g.fundGoal*100));
+  const got=gotMembers[g.id]||new Set();
+  const members=g.members.map(m=>{const has=got.has(m.n);
+    return `<div class="mchip${has?' got':''}"><div class="av">${art(m)}</div><div class="nm">${m.n}</div>${has?'<div class="got-t">GET✓</div>':'<div class="got-t" style="color:#c9ccd6">未</div>'}</div>`;}).join('');
+  return `<div class="fundbox">
+      <div class="ft"><span class="l">🎁 応援ファンド</span><span class="v">¥${fmt(g.fund)} / ¥${fmt(g.fundGoal)}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="reward">達成率 ${pct}%　—　${g.fundReward}</div>
+      <img class="gd-zepp" src="images/zepp_namba.svg" alt="Zeppなんば グランプリ"></div>
+    <div class="sec" style="padding-bottom:0"><h2><span class="dot"></span>メンバー</h2>
+      <p class="sub">緑枠＝GETしたメンバー。推しはハートでブックマーク。</p></div>
+    <div class="mchips">${members}</div>
+    <div class="grid">${TIERS.map(t=>oripaCardHTML(g,t)).join('')}</div>`;
+}
+
+// ============ PULL ============
+let lastBox=null,lastN=1;
+function doPull(box,n){
+  const g=box.group, tier=box.tier;
+  const cost=tier.cost*n;
+  if(coins<cost){toast('コインが足りません。＋からチャージ（デモ）');return;}
+  coins-=cost;updateCoins();
+  lastBox=box;lastN=n;
+  const isMajor=g.tier==='メジャー';const V=RVAL[isMajor?'major':'indie'];
+  const items=[];
+  for(let i=0;i<n;i++){
+    const rar=rollRarity(tier);
+    const mi=Math.floor(Math.random()*g.members.length);
+    const value=Math.max(V[rar],tier.min); // 最低保証
+    items.push({m:g.members[mi],rar,value});
+  }
+  if(n>=10&&tier.gtee&&!items.some(o=>RORDER.indexOf(o.rar)<=RORDER.indexOf(tier.gtee))){
+    const idx=Math.floor(Math.random()*n);items[idx].rar=tier.gtee;items[idx].value=Math.max(V[tier.gtee],tier.min);
+  }
+  if(!gotMembers[g.id])gotMembers[g.id]=new Set();
+  items.forEach(o=>{
+    gotMembers[g.id].add(o.m.n);
+    const key=g.id+'_'+o.m.n+'_'+o.rar;
+    if(!collection[key])collection[key]={group:g,m:o.m,rar:o.rar,value:o.value,qty:0};
+    collection[key].qty++;
+  });
+  if(g.tier==='地下'){g.fund+=Math.round(cost*0.3);} // 売上の一部を応援ファンドへ
+  g.volume+=n;
+  showOpening(items,g,tier);
+}
+
+function showOpening(items,g,tier){
+  const isMajor=g.tier==='メジャー';
+  const ov=$('#opening');ov.classList.add('show');
+  const flip=$('#flip');flip.classList.remove('flip');
+  $('#rmulti').innerHTML='';$('#rperk').textContent='';$('#rlabel').textContent='開封中…';
+  const best=items.reduce((a,b)=>RORDER.indexOf(b.rar)<RORDER.indexOf(a.rar)?b:a);
+  const holo=RORDER.indexOf(best.rar)<=3; // R以上でホロ
+  const cf=$('#cardfront');
+  cf.innerHTML=art(best.m)+`<div class="frame"></div>`+(holo?'<div class="holo"></div>':'');
+  const frameCol={UR:'#F5455C',SSR:'#8A5CF0',SR:'#F6B821',R:'#4aa3ff',N:'rgba(255,255,255,.15)'}[best.rar];
+  cf.querySelector('.frame').style.boxShadow=`0 0 0 ${best.rar==='UR'?6:best.rar==='SSR'?5:4}px ${frameCol} inset`;
+  setTimeout(()=>{
+    flip.classList.add('flip');
+    $('#rlabel').innerHTML=`<span style="color:${best.m.color||g.color}">${best.m.n}</span> の <b>${best.rar}</b>！ <span style="opacity:.85">¥${fmt(best.value)}相当</span>`;
+    const h=cf.querySelector('.holo'); if(h)h.classList.add('run');
+    $('#rperk').innerHTML=`${perkText(best.rar,isMajor)}<br><span style="opacity:.7;font-size:11px">最低保証 ${fmt(tier.min)}コイン相当（手ぶらにならない）</span>`;
+    if(items.length>1){const mm=$('#rmulti');
+      items.forEach(o=>{const c=document.createElement('div');c.className='mc';
+        c.innerHTML=`<div class="rr">${o.rar}</div>`+art(o.m);mm.appendChild(c);});}
+  },650);
+}
+$('#ragain').onclick=()=>{if(lastBox)doPull(lastBox,lastN);};
+$('#rclose').onclick=()=>{$('#opening').classList.remove('show');refreshAll();};
+
+// ============ RENDER: ranking ============
+function renderRank(){
+  // 部門別グランプリ
+  const cats=[{key:'男',label:'男性・地下部門'},{key:'女',label:'女性・地下部門'}];
+  const gp=$('#gp-list');gp.innerHTML='';
+  cats.forEach(c=>{
+    const top=GROUPS.filter(g=>g.gender===c.key&&g.tier==='地下').sort((a,b)=>b.volume-a.volume)[0];
+    if(!top)return;
+    const el=document.createElement('div');el.className='gp';
+    el.innerHTML=`<img class="gp-img" src="images/zepp_namba.svg" alt="Zeppなんば">
+      <div class="gp-body">
+        <div class="gp-h"><img class="mini" src="${top.thumb}" alt="">
+          <div class="t"><div class="cat">🏆 ${c.label} 暫定1位</div>
+          <div class="nm" style="color:${top.color}">${top.name}</div></div></div>
+        <div class="rw"><span class="ic">🎤</span><span><b>Zeppなんば ワンマン公演</b>（会場・制作費はトレカセンターが負担）</span></div>
+        <div class="rw"><span class="ic">🎪</span><span>トレカセンター主催「<b>OSHI ORIPA FES</b>」メインステージ出演</span></div>
+        <div class="rw"><span class="ic">🎬</span><span>新曲<b>MV制作</b> ＆ 全国流通の<b>公式グッズ化</b></span></div>
+        <div class="note">※実現は会場・所属事務所との調整が前提。副賞は応援ファンドの到達額に応じて拡大。</div>
+      </div>`;
+    el.onclick=()=>openGroup(top);
+    gp.appendChild(el);
+  });
+  const l=$('#rank-list');l.innerHTML='';
+  const ranked=[...GROUPS].filter(g=>g.tier==='地下').sort((a,b)=>b.volume-a.volume);
+  const max=ranked[0].volume;
+  ranked.slice(0,10).forEach((g,i)=>{
+    const el=document.createElement('div');el.className='rk-item'+(i<3?' top'+(i+1):'');
+    const pct=Math.min(100,Math.round(g.fund/g.fundGoal*100));
+    el.innerHTML=`<div class="no">${i+1}</div><img src="${g.thumb}" alt="">
+      <div class="info"><div class="nm" style="color:${g.color}">${g.name}</div>
+        <div class="pt">流通量 ${fmt(g.volume)} ・ 応援ファンド ${pct}%</div>
+        <div class="rk-bar"><i style="width:${Math.round(g.volume/max*100)}%;background:${g.color}"></i></div></div>
+      ${i===0?'<div style="font-size:20px">👑</div>':''}`;
+    el.onclick=()=>openGroup(g);
+    l.appendChild(el);
+  });
+}
+
+// ============ RENDER: collection ============
+function renderColl(){
+  const grid=$('#coll-grid');grid.innerHTML='';
+  const items=Object.values(collection).sort((a,b)=>RORDER.indexOf(a.rar)-RORDER.indexOf(b.rar));
+  $('#coll-empty').style.display=items.length?'none':'block';
+  let val=0;
+  items.forEach(it=>{val+=(it.value||0)*it.qty;
+    const el=document.createElement('div');el.className='citem';
+    el.innerHTML=`<span class="rar" style="background:${it.m.color||it.group.color}">${it.rar}</span>${art(it.m)}<span class="qty">×${it.qty}</span>`;
+    grid.appendChild(el);});
+  $('#inv-val').textContent='¥'+fmt(val);
+}
+
+// ============ NAV ============
+function go(v){
+  $$('.view').forEach(x=>x.classList.remove('active'));
+  $('#v-'+v).classList.add('active');
+  $$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  if(v==='home')renderGroups();
+  if(v==='group')renderGroup();
+  if(v==='rank')renderRank();
+  if(v==='coll')renderColl();
+  window.scrollTo(0,0);
+}
+$$('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+function refreshAll(){if($('#v-group').classList.contains('active'))renderGroup();
+  if($('#v-home').classList.contains('active'))renderGroups();
+  if($('#v-rank').classList.contains('active'))renderRank();
+  if($('#v-coll').classList.contains('active'))renderColl();}
+
+// init
+renderCats();bindFilters();renderGroups();
+</script>
+</body>
+</html>
